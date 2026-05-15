@@ -97,13 +97,13 @@ def review(
 
     report = analyze(policy, owner_threshold=owner_threshold)
 
-    fmt = OutputFormat.TEXT
-    if output in OutputFormat._value2member_map_:
+    try:
         fmt = OutputFormat(output)
-    else:
+    except ValueError:
         err_console.print(
             f"[Warning] Unknown output format '{output}'. Falling back to 'text'."
         )
+        fmt = OutputFormat.TEXT
 
     rendered = render(report, fmt)
 

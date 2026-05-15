@@ -29,6 +29,14 @@ from .reporters import render
 logger = logging.getLogger(__name__)
 
 
+def _parse_output_format(value: str, default: OutputFormat = OutputFormat.JSON) -> OutputFormat:
+    """Safely parse *value* into an :class:`OutputFormat`, returning *default* on failure."""
+    try:
+        return OutputFormat(value)
+    except ValueError:
+        return default
+
+
 # ---------------------------------------------------------------------------
 # Tool implementations
 # ---------------------------------------------------------------------------
@@ -58,7 +66,7 @@ def review_policy_document(policy_json: str, output_format: str = "json") -> str
         return json.dumps({"error": f"Policy parse error: {exc}"})
 
     report = analyze(policy)
-    fmt = OutputFormat(output_format) if output_format in OutputFormat._value2member_map_ else OutputFormat.JSON
+    fmt = _parse_output_format(output_format)
     return render(report, fmt)
 
 
@@ -87,7 +95,7 @@ def review_policy_file(file_path: str, output_format: str = "json") -> str:
 
     policy = load_policy_from_dict(data, source=str(path.resolve()))
     report = analyze(policy)
-    fmt = OutputFormat(output_format) if output_format in OutputFormat._value2member_map_ else OutputFormat.JSON
+    fmt = _parse_output_format(output_format)
     return render(report, fmt)
 
 
