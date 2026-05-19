@@ -1,0 +1,63 @@
+{
+  "role_assignments": [
+    {
+      "principal_id": "aaaa-1001",
+      "principal_type": "User",
+      "role_definition_name": "Owner",
+      "scope": "/",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "sp-2001",
+      "principal_type": "ServicePrincipal",
+      "role_definition_name": "Owner",
+      "scope": "/subscriptions/sub-001",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "aaaa-1001",
+      "principal_type": "User",
+      "role_definition_name": "Owner",
+      "scope": "/subscriptions/sub-001",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "bbbb-1002",
+      "principal_type": "User",
+      "role_definition_name": "Owner",
+      "scope": "/subscriptions/sub-001",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "cccc-1003",
+      "principal_type": "User",
+      "role_definition_name": "Owner",
+      "scope": "/subscriptions/sub-001",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "dddd-1004",
+      "principal_type": "User",
+      "role_definition_name": "Owner",
+      "scope": "/subscriptions/sub-001",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "ghost-9999",
+      "principal_type": "User",
+      "role_definition_name": "Contributor",
+      "scope": "/subscriptions/sub-001/resourceGroups/rg-old",
+      "role_definition_id": ""
+    }
+  ],
+  "role_definitions": [
+    {
+      "role_id": "custom-role-001",
+      "name": "My Wildcard Role",
+      "description": "Grants all actions",
+      "permissions": [{"actions": ["*"], "notActions": []}],
+      "assignable_scopes": ["/subscriptions/sub-001"],
+      "is_custom": true
+    }
+  ]
+}

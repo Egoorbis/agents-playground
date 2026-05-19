@@ -1,0 +1,26 @@
+{
+  "role_assignments": [
+    {
+      "principal_id": "aaaa-0001",
+      "principal_type": "User",
+      "role_definition_name": "Owner",
+      "scope": "/subscriptions/sub-001",
+      "role_definition_id": "/subscriptions/sub-001/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+    },
+    {
+      "principal_id": "bbbb-0002",
+      "principal_type": "User",
+      "role_definition_name": "Contributor",
+      "scope": "/subscriptions/sub-001/resourceGroups/rg-app",
+      "role_definition_id": ""
+    },
+    {
+      "principal_id": "cccc-0003",
+      "principal_type": "ServicePrincipal",
+      "role_definition_name": "Reader",
+      "scope": "/subscriptions/sub-001/resourceGroups/rg-app",
+      "role_definition_id": ""
+    }
+  ],
+  "role_definitions": []
+}
