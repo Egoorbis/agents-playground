@@ -26,17 +26,13 @@ class TestReviewCommand:
         assert result.exit_code in (2, 3)
 
     def test_review_json_output(self) -> None:
-        result = runner.invoke(
-            app, ["review", str(FIXTURES_DIR / "clean_policy.json"), "--output", "json"]
-        )
+        result = runner.invoke(app, ["review", str(FIXTURES_DIR / "clean_policy.json"), "--output", "json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "findings" in data
 
     def test_review_markdown_output(self) -> None:
-        result = runner.invoke(
-            app, ["review", str(FIXTURES_DIR / "clean_policy.json"), "--output", "markdown"]
-        )
+        result = runner.invoke(app, ["review", str(FIXTURES_DIR / "clean_policy.json"), "--output", "markdown"])
         assert result.exit_code == 0
         # Rich renders Markdown as styled text (strips '#'), but key content must be present
         assert "IAM / RBAC Security Review Report" in result.output

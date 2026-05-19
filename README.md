@@ -134,6 +134,116 @@ iam_rbac_reviewer/
 
 ---
 
+## Demo Deployment to Microsoft Foundry
+
+Follow these steps to deploy and run the IAM RBAC reviewer agent on Azure AI Foundry for a demo session.
+
+### Prerequisites
+
+- **Azure AI Foundry project** with a model deployment (e.g., `gpt-4o`)
+- **Azure CLI** installed and authenticated (`az login`)
+- **Python 3.11+** available in your shell
+- **Model deployment name** known (e.g., `gpt-4o` or your custom deployment)
+
+### Environment Setup
+
+```bash
+# Set your Foundry project endpoint and model deployment name
+export AZURE_AI_PROJECT_ENDPOINT="https://<your-hub>.services.ai.azure.com/..."
+export AZURE_OPENAI_MODEL="<your-model-deployment-name>"  # e.g., gpt-4o
+
+# Optional: Set default subscription for policy review
+export AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
+```
+
+Replace:
+- `<your-hub>` with your Foundry hub name
+- `<your-model-deployment-name>` with your model deployment name (e.g., `gpt-4o`)
+- `<your-subscription-id>` (optional) with your default Azure subscription ID
+
+### Install and Validate
+
+```bash
+# Install the package in development mode with dev dependencies
+pip install -e ".[dev]"
+
+# Verify CLI is available
+iam-rbac-reviewer --help
+
+# List all supported security checks
+iam-rbac-reviewer list-checks
+```
+
+### Demo Smoke Tests
+
+Run these commands to validate both CLI and Foundry agent workflows:
+
+#### 1. Review Command (Works Offline)
+
+```bash
+# Analyze a local policy file and display findings as Markdown
+iam-rbac-reviewer review tests/fixtures/risky_policy.json --output markdown
+
+# Review with JSON output for automation
+iam-rbac-reviewer review tests/fixtures/risky_policy.json --output json | jq
+```
+
+Expected result:
+- At least one CRITICAL or HIGH finding displayed
+- Findings sorted by severity (CRITICAL → HIGH → MEDIUM → LOW)
+- Remediation steps included for each finding
+
+#### 2. Ask Command (Requires Foundry)
+
+```bash
+# Ask the Foundry agent a free-form security question
+# Agent uses configured tools to ground answers in policy data
+iam-rbac-reviewer ask "Which roles grant Owner access at the root scope?"
+
+iam-rbac-reviewer ask "List all critical RBAC findings from tests/fixtures/risky_policy.json"
+```
+
+Expected result:
+- Agent returns a natural-language response
+- Response references specific findings or checks
+- Tool calls happen in the background (logs show tool dispatch)
+
+#### 3. Explain Command
+
+```bash
+# Get detailed explanation and remediation for a specific check
+iam-rbac-reviewer explain IOAR-001
+iam-rbac-reviewer explain IOAR-002
+```
+
+### Demo Success Criteria
+
+✅ **Setup**: Environment variables set, CLI entrypoint works  
+✅ **Review**: Runs in under 5 seconds, finds at least one CRITICAL/HIGH finding  
+✅ **Ask**: Foundry agent responds within 30 seconds, references tools  
+✅ **Explain**: Returns remediation steps for each check  
+
+### Troubleshooting
+
+**Issue**: `AZURE_AI_PROJECT_ENDPOINT is not set`
+- Solution: Set the environment variable: `export AZURE_AI_PROJECT_ENDPOINT="https://..."`
+
+**Issue**: `Credential not found` or authentication fails
+- Solution: Run `az login` first and ensure your account has access to the Foundry project
+
+**Issue**: Model deployment name mismatch
+- Solution: Verify `AZURE_OPENAI_MODEL` matches a real deployment in your Foundry project
+- List deployments: Check your Foundry project portal or run `az ai model list` (if available)
+
+**Issue**: `AttributeError: module 'azure.ai.projects' has no attribute 'aio'`
+- Solution: Upgrade the package: `pip install --upgrade azure-ai-projects`
+
+**Issue**: Review command runs but finds no findings
+- Solution: Ensure policy file follows the normalized schema (see [Review a policy file](#review-a-policy-file))
+- Test with the provided fixture: `iam-rbac-reviewer review tests/fixtures/risky_policy.json`
+
+---
+
 ## License
 
 MIT

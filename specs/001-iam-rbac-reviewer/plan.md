@@ -1,6 +1,6 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: IAM RBAC Reviewer Foundry Demo Deployment
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Branch**: `001-iam-rbac-reviewer` | **Date**: 2026-05-19 | **Spec**: [specs/001-iam-rbac-reviewer/spec.md](specs/001-iam-rbac-reviewer/spec.md)
 
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
@@ -12,29 +12,23 @@
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Language/Version**: Python 3.11+
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: azure-ai-projects, azure-identity, typer, rich, pydantic, pyyaml, httpx
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: File-based inputs (JSON/YAML policy files); no persistent storage required.
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: pytest, pytest-cov, pytest-asyncio with mocked Azure SDK calls.
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Target Platform**: Linux/macOS/Windows CLI runtime (Python environment).
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: Single-project Python CLI with integrated Foundry agent orchestration.
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Performance Goals**: Analyze up to 500 IAM roles in ≤ 30 seconds on a standard laptop (M1/i7, 16 GB RAM).
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Constraints**: Tests run fully offline with no external service calls; CLI output must be deterministic; no credentials logged or printed.
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
-
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Scale/Scope**: Single subscription or management-group RBAC snapshot (typical policy files 50–500 role assignments).
 
 ## Constitution Check
 

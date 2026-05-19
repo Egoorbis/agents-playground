@@ -100,9 +100,7 @@ def review(
     try:
         fmt = OutputFormat(output)
     except ValueError:
-        err_console.print(
-            f"[Warning] Unknown output format '{output}'. Falling back to 'text'."
-        )
+        err_console.print(f"[Warning] Unknown output format '{output}'. Falling back to 'text'.")
         fmt = OutputFormat.TEXT
 
     rendered = render(report, fmt)
@@ -206,8 +204,7 @@ def ask(
     settings = get_settings()
     if not settings.foundry_configured:
         err_console.print(
-            "[Warning] AZURE_AI_PROJECT_ENDPOINT is not set. "
-            "Running in offline/local mode — full NLU is not available."
+            "[Warning] AZURE_AI_PROJECT_ENDPOINT is not set. Running in offline/local mode — full NLU is not available."
         )
 
     response = asyncio.run(run_agent(question))

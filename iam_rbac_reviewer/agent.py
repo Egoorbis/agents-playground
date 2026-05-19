@@ -101,8 +101,7 @@ async def run_agent(user_message: str) -> str:
         return await _run_foundry_agent(user_message, settings)
 
     logger.warning(
-        "AZURE_AI_PROJECT_ENDPOINT is not set — running in local (offline) mode. "
-        "Only direct tool calls will work."
+        "AZURE_AI_PROJECT_ENDPOINT is not set — running in local (offline) mode. Only direct tool calls will work."
     )
     return _run_local_agent(user_message)
 
@@ -126,10 +125,13 @@ async def _run_foundry_agent(user_message: str, settings: Settings) -> str:
             "Install them with: pip install azure-ai-projects azure-identity"
         ) from exc
 
-    async with DefaultAzureCredential() as credential, AIProjectClient(
-        endpoint=settings.azure_ai_project_endpoint,
-        credential=credential,
-    ) as client:
+    async with (
+        DefaultAzureCredential() as credential,
+        AIProjectClient(
+            endpoint=settings.azure_ai_project_endpoint,
+            credential=credential,
+        ) as client,
+    ):
         # Create an ephemeral agent for this request
         agent = await client.agents.create_agent(
             model=settings.azure_openai_model,
@@ -174,11 +176,7 @@ async def _run_foundry_agent(user_message: str, settings: Settings) -> str:
         messages = await client.agents.list_messages(thread_id=thread.id)
         for msg in messages.data:
             if msg.role == "assistant":
-                text_parts = [
-                    c.text.value
-                    for c in msg.content
-                    if hasattr(c, "text")
-                ]
+                text_parts = [c.text.value for c in msg.content if hasattr(c, "text")]
                 return "\n".join(text_parts)
 
         # Clean up ephemeral agent
@@ -211,6 +209,7 @@ def _run_local_agent(user_message: str) -> str:
 
     # Try to extract a file path from the message (crude heuristic)
     import re
+
     file_match = re.search(r"[\w./\\-]+\.(json|yaml|yml)", user_message)
     if file_match:
         return TOOL_REGISTRY["review_policy_file"](file_match.group(0))

@@ -19,9 +19,7 @@ class TestSettings:
         assert s.foundry_configured is False
 
     def test_foundry_configured_when_endpoint_set(self) -> None:
-        s = Settings(
-            AZURE_AI_PROJECT_ENDPOINT="https://example.azure.com/projects/my-project"
-        )
+        s = Settings(AZURE_AI_PROJECT_ENDPOINT="https://example.azure.com/projects/my-project")
         assert s.foundry_configured is True
 
     def test_log_level_normalised_to_uppercase(self) -> None:
@@ -30,6 +28,7 @@ class TestSettings:
 
     def test_invalid_log_level_raises(self) -> None:
         from pydantic import ValidationError
+
         with pytest.raises(ValidationError):
             Settings(IAM_REVIEWER_LOG_LEVEL="VERBOSE")
 

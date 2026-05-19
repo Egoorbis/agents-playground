@@ -82,8 +82,7 @@ def check_owner_at_root_scope(
                 Recommendation(
                     title="Reduce scope to resource group or specific resource",
                     description=(
-                        "Reassign the role to the narrowest scope needed. "
-                        "Use resource-group-level scope at minimum."
+                        "Reassign the role to the narrowest scope needed. Use resource-group-level scope at minimum."
                     ),
                     reference_url="https://learn.microsoft.com/azure/role-based-access-control/best-practices",
                 )
@@ -144,8 +143,7 @@ def check_service_principal_with_owner(
     affected = [
         a
         for a in assignments
-        if a.principal_type in {"ServicePrincipal", "ManagedIdentity"}
-        and a.role_definition_name in _CRITICAL_ROLES
+        if a.principal_type in {"ServicePrincipal", "ManagedIdentity"} and a.role_definition_name in _CRITICAL_ROLES
     ]
     if not affected:
         return []
@@ -275,10 +273,7 @@ def check_no_guest_users_with_privileged_roles(
 
     privileged_roles = _CRITICAL_ROLES | _HIGH_PRIVILEGE_ROLES
     affected = [
-        a
-        for a in assignments
-        if a.principal_id in guest_principal_ids
-        and a.role_definition_name in privileged_roles
+        a for a in assignments if a.principal_id in guest_principal_ids and a.role_definition_name in privileged_roles
     ]
     if not affected:
         return []

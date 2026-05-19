@@ -1,12 +1,12 @@
-# Feature Specification: [FEATURE NAME]
+# Feature Specification: IAM RBAC Reviewer Foundry Demo Deployment
 
-**Feature Branch**: `[###-feature-name]`
+**Feature Branch**: `001-iam-rbac-reviewer`
 
-**Created**: [DATE]
+**Created**: 2026-05-19
 
-**Status**: Draft
+**Status**: Ready for Implementation
 
-**Input**: User description: "$ARGUMENTS"
+**Input**: Demo deployment of IAM RBAC reviewer agent to Azure AI Foundry for security analysis and demo session
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -23,60 +23,60 @@
   - Demonstrated to users independently
 -->
 
-### User Story 1 - [Brief Title] (Priority: P1)
+### User Story 1 - Review IAM Policies from CLI (Priority: P1)
 
-[Describe this user journey in plain language]
+A security analyst runs the `review` command on a local policy file and receives severity-sorted findings with concrete remediation steps.
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: Core CLI capability is essential MVP that works offline.
 
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
----
-
-### User Story 2 - [Brief Title] (Priority: P2)
-
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: Can be fully tested with local fixture files without Foundry connectivity. Delivers analysis value standalone.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** a valid JSON policy file with role assignments, **When** analyst runs `iam-rbac-reviewer review policy.json`, **Then** findings are displayed sorted CRITICAL → HIGH → MEDIUM → LOW with remediation for each.
+2. **Given** a YAML policy file, **When** analyst specifies `--output markdown`, **Then** output is valid Markdown suitable for documentation.
+3. **Given** a policy with no findings, **When** analyst reviews it, **Then** tool exits with code 0 and reports clean status.
 
 ---
 
-### User Story 3 - [Brief Title] (Priority: P3)
+### User Story 2 - Ask Free-Form Questions via Foundry Agent (Priority: P2)
 
-[Describe this user journey in plain language]
+A security analyst asks the Foundry-backed agent free-form natural-language questions about IAM/RBAC and receives accurate tool-grounded answers.
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: Differentiates this tool as an AI-powered agent; enables complex investigation workflows.
 
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: When Foundry endpoint is configured, ask command dispatches tools and returns agent responses. Gracefully degrades to offline mode with clear error when endpoint missing.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** Foundry endpoint configured, **When** analyst asks "Which roles grant Owner at the root scope?", **Then** agent calls review tools and returns findings from policy.
+2. **Given** no Foundry endpoint, **When** analyst runs ask, **Then** offline mode activates with clear message about limitations.
+3. **Given** a malformed question, **When** agent processes it, **Then** error is logged and friendly fallback message returned.
 
 ---
 
-[Add more user stories as needed, each with an assigned priority]
+### User Story 3 - Demo Operator Deploys and Validates in < 10 Minutes (Priority: P3)
+
+A demo operator configures environment variables, runs setup, and validates both CLI and agent workflows with provided smoke-test commands.
+
+**Why this priority**: Enables rapid deployment for customer/internal demos without troubleshooting friction.
+
+**Independent Test**: Operator completes documented steps and successfully runs at least one review and one ask command with real Foundry endpoint.
+
+**Acceptance Scenarios**:
+
+1. **Given** documented Foundry endpoint and model name, **When** operator sets env vars and runs `pip install -e .`, **Then** setup completes without errors.
+2. **Given** installed package, **When** operator runs `iam-rbac-reviewer list-checks`, **Then** all 6 supported checks are listed with severity.
+3. **Given** configured Foundry, **When** operator runs smoke-test commands, **Then** both review and ask return results within 30 seconds.
 
 ### Edge Cases
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
-
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+- **Malformed input**: Policy file is invalid JSON or YAML — tool exits with clear error message.
+- **Missing required fields**: Policy lacks `role_assignments` or `role_definitions` arrays — validation error with schema reference.
+- **Unknown finding ID**: User requests `explain IOAR-999` for non-existent check — tool returns error with list of valid IDs.
+- **Missing Foundry endpoint**: User runs `ask` without `AZURE_AI_PROJECT_ENDPOINT` — tool displays offline warning and falls back to local mode.
+- **Tool call failure**: Foundry agent requires_action loop receives bad arguments from LLM — tool call dispatch catches TypeError and returns JSON error.
+- **Empty policy**: Policy has empty role_assignments array — analysis completes with zero findings, exit code 0.
 
 ## Requirements *(mandatory)*
 
@@ -87,47 +87,35 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-001**: CLI `review` command MUST accept JSON and YAML policy files via file path argument.
+- **FR-002**: All findings MUST be sorted by severity (CRITICAL → HIGH → MEDIUM → LOW → INFO) in CLI output and all renderer formats.
+- **FR-003**: CLI `review` MUST support three output formats: `text` (default with Rich formatting), `json` (structured output), and `markdown` (documentation-ready).
+- **FR-004**: CLI `ask` command MUST use Foundry mode when `AZURE_AI_PROJECT_ENDPOINT` is set, and local/offline mode otherwise.
+- **FR-005**: CLI `explain` command MUST return deterministic, tool-agnostic remediation guidance for each check ID (IOAR-001 through IOAR-006).
+- **FR-006**: Demo deployment MUST succeed with only documented environment variable setup; no code edits required.
+- **FR-007**: All error messages MUST explain what failed, why it failed, and how to fix it.
+- **FR-008**: Test suite MUST run fully offline with mocked Azure calls; no external service dependencies in CI.
 
-*Example of marking unclear requirements:*
+### Key Entities
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
-
-### Key Entities *(include if feature involves data)*
-
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
+- **RoleAssignment**: Role granted to a principal (user, service principal, managed identity) at a specific scope (subscription, resource group, etc.).
+- **RoleDefinition**: Named role with a set of permissions; includes custom and built-in definitions.
+- **Finding**: Security issue identified by a check, with severity, ID (IOAR-###), title, and remediation guidance.
+- **AnalysisReport**: Result of analyzing a policy; contains sorted findings, counts by severity, and metadata (source, timestamp).
 
 ## Success Criteria *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
-  When relevant, include criteria for UX consistency, validation coverage, and
-  performance budgets so the feature can be reviewed against the constitution.
--->
-
 ### Measurable Outcomes
 
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-001**: Demo operator completes full setup and executes at least one successful `review` and one `ask` command in ≤ 10 minutes using documented steps.
+- **SC-002**: `review` command on risky_policy.json fixture returns at least one CRITICAL or HIGH finding and completes in ≤ 5 seconds on a standard laptop.
+- **SC-003**: All three supported output formats (`text`, `json`, `markdown`) render without runtime errors on both clean and risky test fixtures.
+- **SC-004**: Test suite achieves ≥ 90% line coverage on core modules: `analyzer.py`, `tools.py`, `reporters.py`.
 
 ## Assumptions
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right assumptions based on reasonable defaults
-  chosen when the feature description did not specify certain details.
--->
-
-- [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
-- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
-- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- Azure AI Foundry project and model deployment already exist in the target subscription.
+- Demo operator can authenticate using Azure CLI default credential or managed identity.
+- Input policies follow the normalized schema documented in README.md (role_assignments and role_definitions arrays).
+- Offline/test mode (without Foundry) is acceptable for CI/CD and developer validation.
+- Python 3.11+ runtime is available on demo machine.

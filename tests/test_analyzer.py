@@ -176,9 +176,7 @@ class TestCheckServicePrincipalWithOwner:
 
 
 class TestCheckWildcardPermissions:
-    def test_detects_wildcard_in_custom_role(
-        self, policy_with_wildcard_custom_role: PolicyDocument
-    ) -> None:
+    def test_detects_wildcard_in_custom_role(self, policy_with_wildcard_custom_role: PolicyDocument) -> None:
         findings = check_wildcard_permissions(policy_with_wildcard_custom_role.role_definitions)
         assert len(findings) == 1
         assert findings[0].finding_id == "IOAR-004"
@@ -254,17 +252,13 @@ class TestCheckGuestUsersWithPrivilegedRoles:
 
     def test_detects_guest_with_owner(self) -> None:
         assignments = [self._assignment("guest-001", "Owner")]
-        findings = check_no_guest_users_with_privileged_roles(
-            assignments, guest_principal_ids={"guest-001"}
-        )
+        findings = check_no_guest_users_with_privileged_roles(assignments, guest_principal_ids={"guest-001"})
         assert len(findings) == 1
         assert findings[0].finding_id == "IOAR-006"
 
     def test_no_finding_for_guest_reader(self) -> None:
         assignments = [self._assignment("guest-001", "Reader")]
-        findings = check_no_guest_users_with_privileged_roles(
-            assignments, guest_principal_ids={"guest-001"}
-        )
+        findings = check_no_guest_users_with_privileged_roles(assignments, guest_principal_ids={"guest-001"})
         assert findings == []
 
     def test_no_finding_when_guest_ids_not_provided(self) -> None:

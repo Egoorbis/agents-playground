@@ -196,8 +196,7 @@ def explain_finding(finding_id: str) -> str:
 
     info = explanations.get(finding_id.upper())
     if info is None:
-        return json.dumps({"error": f"Unknown finding_id: '{finding_id}'. "
-                           f"Known IDs: {list(explanations.keys())}"})
+        return json.dumps({"error": f"Unknown finding_id: '{finding_id}'. Known IDs: {list(explanations.keys())}"})
 
     return json.dumps({"finding_id": finding_id.upper(), **info})
 
@@ -238,8 +237,7 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
                     "policy_json": {
                         "type": "string",
                         "description": (
-                            "JSON string containing 'role_assignments' and optionally "
-                            "'role_definitions' arrays."
+                            "JSON string containing 'role_assignments' and optionally 'role_definitions' arrays."
                         ),
                     },
                     "output_format": {

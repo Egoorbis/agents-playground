@@ -12,11 +12,11 @@ from .models import AnalysisReport, OutputFormat, Severity
 
 # Severity → ANSI colour for the plain-text renderer
 _SEVERITY_COLOUR: dict[Severity, str] = {
-    Severity.CRITICAL: "\033[1;31m",   # bold red
-    Severity.HIGH: "\033[31m",          # red
-    Severity.MEDIUM: "\033[33m",        # yellow
-    Severity.LOW: "\033[34m",           # blue
-    Severity.INFO: "\033[37m",          # grey
+    Severity.CRITICAL: "\033[1;31m",  # bold red
+    Severity.HIGH: "\033[31m",  # red
+    Severity.MEDIUM: "\033[33m",  # yellow
+    Severity.LOW: "\033[34m",  # blue
+    Severity.INFO: "\033[37m",  # grey
 }
 _RESET = "\033[0m"
 
@@ -87,13 +87,17 @@ def render_text(report: AnalysisReport, *, use_colour: bool = True) -> str:
         lines.append(f"  {finding.description}")
 
         if finding.affected_principals:
-            lines.append(f"  Principals : {', '.join(finding.affected_principals[:5])}" +
-                         (" …" if len(finding.affected_principals) > 5 else ""))
+            lines.append(
+                f"  Principals : {', '.join(finding.affected_principals[:5])}"
+                + (" …" if len(finding.affected_principals) > 5 else "")
+            )
         if finding.affected_roles:
             lines.append(f"  Roles      : {', '.join(finding.affected_roles)}")
         if finding.affected_scopes:
-            lines.append(f"  Scopes     : {', '.join(finding.affected_scopes[:3])}" +
-                         (" …" if len(finding.affected_scopes) > 3 else ""))
+            lines.append(
+                f"  Scopes     : {', '.join(finding.affected_scopes[:3])}"
+                + (" …" if len(finding.affected_scopes) > 3 else "")
+            )
         if finding.cis_controls:
             lines.append(f"  CIS        : {', '.join(finding.cis_controls)}")
 
@@ -133,9 +137,7 @@ def render_json(report: AnalysisReport) -> str:
     data["low_count"] = report.low_count
     # Sort findings by severity
     data["findings"] = json.loads(
-        AnalysisReport(
-            **{**report.model_dump(), "findings": list(report.findings_by_severity)}
-        ).model_dump_json()
+        AnalysisReport(**{**report.model_dump(), "findings": list(report.findings_by_severity)}).model_dump_json()
     )["findings"]
     return json.dumps(data, indent=2, default=str)
 
@@ -160,9 +162,7 @@ def render_markdown(report: AnalysisReport) -> str:
     lines.append("| Field | Value |")
     lines.append("|---|---|")
     lines.append(f"| **Report ID** | `{report.report_id}` |")
-    lines.append(
-        f"| **Generated** | {report.generated_at.strftime('%Y-%m-%d %H:%M:%S UTC')} |"
-    )
+    lines.append(f"| **Generated** | {report.generated_at.strftime('%Y-%m-%d %H:%M:%S UTC')} |")
     lines.append(f"| **Source** | {report.source or '(none)'} |")
     lines.append(f"| **Policy type** | {report.policy_type.value} |")
     lines.append(f"| **Assignments reviewed** | {report.total_assignments_reviewed} |")
